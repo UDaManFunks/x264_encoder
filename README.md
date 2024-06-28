@@ -32,7 +32,7 @@ Create Directory C:\VideoEditngUtils\x264_plugin_build
 1) run the "x64 Native Tools Command Prompt for VS 2022" - type it in the seach bar in the Windows Task Bar
 2) Inside the command prompt, type "cd /d C:\msys64"
 3) Execute the command "msys2_shell.cmd -mingw64 -full-path"
-4) This will open up another terminal, type in (in the new terminal)
+4) This will open up another terminal, type in the following commands (in the new terminal)
 5) cd /C/VideoEditingUtils/x264_plugin/build/x264
 6) CC=cl ./configure --enable-shared
 7) make
