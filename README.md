@@ -65,4 +65,4 @@ You can export using X264 if you pick "QUICKTIME" or "MP4" as your FORMAT in Dav
 
 [LINUX]
 
-TODO
+TODO - this is very straightforward, just make sure you compile x264 with the additional -fPIC CFLAGS
