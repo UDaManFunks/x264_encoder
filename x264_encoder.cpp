@@ -301,7 +301,7 @@ private:
 
 		{
 			HostUIConfigEntryRef item("x264_bitrate");
-			item.MakeSlider("Bit Rate", "KBps", m_BitRate, 100, 3000, 1);
+			item.MakeSlider("Bit Rate", "Kbps", m_BitRate, 100, 100000, 1);
 			item.SetHidden((m_QualityMode != X264_RC_ABR) && (m_NumPasses < 2));
 
 			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
@@ -352,7 +352,7 @@ public:
 
 	int32_t GetBitRate() const
 	{
-		return m_BitRate * 8;
+		return m_BitRate;
 	}
 
 	const std::string& GetMarkerColor() const
