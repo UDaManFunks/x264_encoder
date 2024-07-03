@@ -47,6 +47,9 @@ private:
 private:
 	x264_t* m_pContext;
 	int m_ColorModel;
+	std::string m_TmpFileNameIn;
+	std::string m_TmpFileNameOut;
+
 	std::unique_ptr<UISettingsController> m_pSettings;
 	HostCodecConfigCommon m_CommonProps;
 
