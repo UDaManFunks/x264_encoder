@@ -262,7 +262,7 @@ private:
 			textsVec.push_back("Average Bitrate");
 			valuesVec.push_back(X264_RC_ABR);
 
-			item.MakeRadioBox("Quality Control", textsVec, valuesVec, GetQualityMode());
+			item.MakeRadioBox("Quality", textsVec, valuesVec, GetQualityMode());
 			item.SetTriggersUpdate(true);
 
 			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
