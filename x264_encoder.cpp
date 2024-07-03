@@ -9,10 +9,12 @@
 #include <chrono>
 #include <iostream>
 #include <sstream>
+#include <fstream>
+#include <filesystem>
 
 #include "x264.h"
 
-const uint8_t X264Encoder::s_UUID[] = { 0x6a, 0x88, 0xe8, 0x41, 0xd8, 0xe4, 0x41, 0x4b, 0x87, 0x9e, 0xa4, 0x80, 0xfc, 0x90, 0xda, 0xb4 };
+const uint8_t X264Encoder::s_UUID[] = { 0x6b, 0x88, 0xe8, 0x41, 0xd8, 0xe4, 0x41, 0x4b, 0x87, 0x9e, 0xa4, 0x80, 0xfc, 0x90, 0xda, 0xb4 };
 
 static std::string s_TmpFileName = "/tmp/x264_multipass.log";
 
@@ -47,7 +49,6 @@ public:
 		p_pValues->GetINT32("x264_enc_preset", m_EncPreset);
 		p_pValues->GetINT32("x264_tune", m_Tune);
 		p_pValues->GetINT32("x264_profile", m_Profile);
-
 		p_pValues->GetINT32("x264_num_passes", m_NumPasses);
 		p_pValues->GetINT32("x264_q_mode", m_QualityMode);
 		p_pValues->GetINT32("x264_qp", m_QP);
@@ -100,7 +101,7 @@ private:
 		m_Tune = 0;
 		m_Profile = 1;
 		m_NumPasses = 1;
-		m_QualityMode = X264_RC_CQP;
+		m_QualityMode = X264_RC_CRF;
 		m_QP = 22;
 		m_BitRate = 0;
 	}
@@ -255,9 +256,6 @@ private:
 			std::vector<std::string> textsVec;
 			std::vector<int> valuesVec;
 
-			textsVec.push_back("Constant Quality");
-			valuesVec.push_back(X264_RC_CQP);
-
 			textsVec.push_back("Constant Rate Factor");
 			valuesVec.push_back(X264_RC_CRF);
 
@@ -360,9 +358,23 @@ public:
 		return m_MarkerColor;
 	}
 
+	const std::string& GetTmpFileNameIn() const {
+		return m_TmpFileNameIn;
+	}
+
+	const std::string& GetTmpFileNameOut() const {
+		return m_TmpFileNameOut;
+	}
+
+
 private:
+
 	HostCodecConfigCommon m_CommonProps;
+
 	std::string m_MarkerColor;
+	std::string m_TmpFileNameIn;
+	std::string m_TmpFileNameOut;
+
 	int32_t m_EncPreset;
 	int32_t m_Tune;
 	int32_t m_Profile;
@@ -440,7 +452,6 @@ StatusCode X264Encoder::s_RegisterCodecs(HostListRef* p_pList)
 	std::vector<std::string> containerVec;
 	containerVec.push_back("mp4");
 	containerVec.push_back("mov");
-	containerVec.push_back("ad903d5702f24ac19dde8faca3488051");
 	std::string valStrings;
 	for (size_t i = 0; i < containerVec.size(); ++i)
 	{
@@ -497,7 +508,14 @@ void X264Encoder::DoFlush()
 
 	if (!m_IsMultiPass || (m_PassesDone > 1))
 	{
-		// no need to do anything
+
+		// clean up temp files used in multipass
+		std::filesystem::remove(m_TmpFileNameIn);
+
+		if (std::filesystem::exists(m_TmpFileNameOut)) {
+			std::filesystem::remove(m_TmpFileNameOut);
+		}
+
 		return;
 	}
 
@@ -592,6 +610,8 @@ void X264Encoder::SetupContext(bool p_IsFinalPass)
 
 		param.rc.psz_stat_out = &s_TmpFileName[0];
 		param.rc.psz_stat_in = &s_TmpFileName[0];
+		m_TmpFileNameIn = &s_TmpFileName[0];
+		m_TmpFileNameOut = &s_TmpFileName[0];
 	}
 
 	if (pProfile != NULL)
@@ -711,10 +731,12 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 	int numNals = 0;
 	int bytes = 0;
 	int64_t pts = -1;
+
 	if ((p_pBuff == NULL) || !p_pBuff->IsValid())
 	{
 		// flushing
 		bytes = x264_encoder_encode(m_pContext, &pNals, &numNals, 0, &outPic);
+
 	}
 	else
 	{
@@ -774,24 +796,11 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 		}
 		else
 		{
-			// std::chrono::steady_clock::time_point beginCP = std::chrono::steady_clock::now();
-
 			std::vector<uint8_t> yPlane;
 			std::vector<uint8_t> uvPlane;
 			yPlane.reserve(width * height);
 			uvPlane.reserve(width * height / 2);
 
-
-			/*
-			
-			std::chrono::steady_clock::time_point reserveCP = std::chrono::steady_clock::now();
-
-			std::string s_durationMsg = "X264 Plugin :: Y + UV reservation  microseconds :: ";
-			s_durationMsg.append(std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(reserveCP - beginCP).count()));
-			g_Log(logLevelInfo, s_durationMsg.c_str());
-			
-			*/
-						
 			const uint8_t* pSrc = reinterpret_cast<uint8_t*>(const_cast<char*>(pBuf));
 
 			for (int h = 0; h < height; ++h)
@@ -819,7 +828,7 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 			inPic.img.plane[1] = uvPlane.data();
 
 			bytes = x264_encoder_encode(m_pContext, &pNals, &numNals, &inPic, &outPic);
-			
+
 		}
 	}
 
