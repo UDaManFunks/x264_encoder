@@ -7,8 +7,7 @@
 #include "x264_encoder.h"
 #include "dummy_container.h"
 
-// NOTE: When creating a plugin for release, please generate a new Plugin UUID in order to prevent conflicts with other third-party plugins.
-static const uint8_t pMyUUID[] = { 0x5d, 0x43, 0xce, 0x60, 0x45, 0x11, 0x4f, 0x58, 0x87, 0xde, 0xf3, 0x02, 0x80, 0x1e, 0x7b, 0xbc };
+static const uint8_t pMyUUID[] = { 0x5e, 0x43, 0xce, 0x60, 0x45, 0x11, 0x4f, 0x58, 0x87, 0xde, 0xf3, 0x02, 0x80, 0x1e, 0x7b, 0xbc };
 
 using namespace IOPlugin;
 
@@ -64,9 +63,6 @@ StatusCode g_ListCodecs(HostListRef* p_pList)
 StatusCode g_ListContainers(HostListRef* p_pList)
 {
     return errNone;
-
-    // Register dummy container if you want to try it, which only prints to the log without exporting any real file
-    // return DummyContainer::s_Register(p_pList);
 }
 
 StatusCode g_GetEncoderSettings(unsigned char* p_pUUID, HostPropertyCollectionRef* p_pValues, HostListRef* p_pSettingsList)
