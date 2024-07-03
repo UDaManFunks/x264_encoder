@@ -5,7 +5,7 @@ BUILDDIR = build
 CFLAGS = -Iinclude -I../x264 -O2 /Fo:$(BUILDDIR)\ /c /EHsc /std:c++17
 LDFLAGS = /DLL wrapper/$(BUILDDIR)/*.obj $(BUILDDIR)/*.obj ../x264/libx264.lib 
 TARGET = x264_encoder.dvcp
-OBJS = plugin.obj x264_encoder.obj dummy_container.obj
+OBJS = plugin.obj x264_encoder.obj
 
 all: prereq make-subdirs $(OBJS) $(TARGET)
 

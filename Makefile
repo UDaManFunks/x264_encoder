@@ -17,7 +17,7 @@ LDFLAGS += -L$(X264_DIR) -lx264
 .PHONY: all
 
 HEADERS = plugin.h x264_encoder.h
-SRCS = plugin.cpp x264_encoder.cpp dummy_container.cpp
+SRCS = plugin.cpp x264_encoder.cpp
 OBJS = $(SRCS:%.cpp=$(OBJ_DIR)/%.o)
 
 all: prereq make-subdirs $(HEADERS) $(SRCS) $(OBJS) $(TARGET)
