@@ -12,7 +12,7 @@ Instructions:
 
 [Pre-Req]
 
-Create Directory C:\VideoEditngUtils\x264_plugin_build
+Create Directory C:\VideoEditingUtils\x264_plugin_build
 
 [Download x264]
 
@@ -33,7 +33,7 @@ Create Directory C:\VideoEditngUtils\x264_plugin_build
 2) Inside the command prompt, type "cd /d C:\msys64"
 3) Execute the command "msys2_shell.cmd -mingw64 -full-path"
 4) This will open up another terminal, type in the following commands (in the new terminal)
-5) cd /C/VideoEditingUtils/x264_plugin/build/x264
+5) cd /C/VideoEditingUtils/x264_plugin_build/x264
 6) CC=cl ./configure --enable-shared
 7) make
 
