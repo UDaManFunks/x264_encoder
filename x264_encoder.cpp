@@ -40,8 +40,7 @@ public:
 	{
 		uint8_t val8 = 0;
 		p_pValues->GetUINT8("x264_reset", val8);
-		if (val8 != 0)
-		{
+		if (val8 != 0) {
 			*this = UISettingsController();
 			return;
 		}
@@ -59,24 +58,21 @@ public:
 	StatusCode Render(HostListRef* p_pSettingsList)
 	{
 		StatusCode err = RenderGeneral(p_pSettingsList);
-		if (err != errNone)
-		{
+		if (err != errNone) {
 			return err;
 		}
 
 		{
 			HostUIConfigEntryRef item("x264_separator");
 			item.MakeSeparator();
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to add a separator entry");
 				return errFail;
 			}
 		}
 
 		err = RenderQuality(p_pSettingsList);
-		if (err != errNone)
-		{
+		if (err != errNone) {
 			return err;
 		}
 
@@ -84,8 +80,7 @@ public:
 			HostUIConfigEntryRef item("x264_reset");
 			item.MakeButton("Reset");
 			item.SetTriggersUpdate(true);
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to populate the button entry");
 				return errFail;
 			}
@@ -103,32 +98,28 @@ private:
 		m_NumPasses = 1;
 		m_QualityMode = X264_RC_CRF;
 		m_QP = 22;
-		m_BitRate = 0;
+		m_BitRate = 8000;
 	}
 
 	StatusCode RenderGeneral(HostListRef* p_pSettingsList)
 	{
-		if (0)
-		{
+		if (0) {
 			HostUIConfigEntryRef item("x264_lbl_general");
 			item.MakeLabel("General Settings");
 
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to populate general label entry");
 				return errFail;
 			}
 		}
 
 		// Markers selection
-		if (m_CommonProps.GetContainer().size() >= 32)
-		{
+		if (m_CommonProps.GetContainer().size() >= 32) {
 			// plugin container in string "plugin_UUID:container_UUID" or "container_UUID" with UUID 32 characters
 			// or "mov", "mp4" etc if non-plugin container
 			HostUIConfigEntryRef item("x264_enc_markers");
 			item.MakeMarkerColorSelector("Chapter Marker", "Marker 1", m_MarkerColor);
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to populate encoder preset UI entry");
 				assert(false);
 				return errFail;
@@ -144,16 +135,14 @@ private:
 
 			int32_t curVal = 1;
 			const char* const* pPresets = x264_preset_names;
-			while (*pPresets != 0)
-			{
+			while (*pPresets != 0) {
 				valuesVec.push_back(curVal++);
 				textsVec.push_back(*pPresets);
 				++pPresets;
 			}
 
 			item.MakeComboBox("Encoder Preset", textsVec, valuesVec, m_EncPreset);
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to populate encoder preset UI entry");
 				return errFail;
 			}
@@ -173,16 +162,14 @@ private:
 			textsVec.push_back("none");
 
 			const char* const* pPresets = x264_tune_names;
-			while (*pPresets != 0)
-			{
+			while (*pPresets != 0) {
 				valuesVec.push_back(curVal++);
 				textsVec.push_back(*pPresets);
 				++pPresets;
 			}
 
 			item.MakeComboBox("Encoder Tune", textsVec, valuesVec, m_Tune);
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to populate tune UI entry");
 				return errFail;
 			}
@@ -205,8 +192,7 @@ private:
 			textsVec.push_back("high422");
 
 			item.MakeComboBox("Encoder Profile", textsVec, valuesVec, m_Profile);
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to populate profile UI entry");
 				return errFail;
 			}
@@ -217,13 +203,11 @@ private:
 
 	StatusCode RenderQuality(HostListRef* p_pSettingsList)
 	{
-		if (0)
-		{
+		if (0) {
 			HostUIConfigEntryRef item("x264_lbl_quality");
 			item.MakeLabel("Quality Settings");
 
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to populate quality label entry");
 				return errFail;
 			}
@@ -242,15 +226,13 @@ private:
 
 			item.MakeComboBox("Passes", textsVec, valuesVec, m_NumPasses);
 			item.SetTriggersUpdate(true);
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to populate passes UI entry");
 				return errFail;
 			}
 		}
 
-		if (m_NumPasses < 2)
-		{
+		if (m_NumPasses < 2) {
 			HostUIConfigEntryRef item("x264_q_mode");
 
 			std::vector<std::string> textsVec;
@@ -265,8 +247,7 @@ private:
 			item.MakeRadioBox("Quality", textsVec, valuesVec, GetQualityMode());
 			item.SetTriggersUpdate(true);
 
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to populate quality UI entry");
 				return errFail;
 			}
@@ -275,23 +256,17 @@ private:
 		{
 			HostUIConfigEntryRef item("x264_qp");
 			const char* pLabel = NULL;
-			if (m_QP < 17)
-			{
+			if (m_QP < 17) {
 				pLabel = "(high)";
-			}
-			else if (m_QP < 34)
-			{
+			} else if (m_QP < 34) {
 				pLabel = "(medium)";
-			}
-			else
-			{
+			} else {
 				pLabel = "(low)";
 			}
 			item.MakeSlider("Factor", pLabel, m_QP, 1, 51, 25);
 			item.SetTriggersUpdate(true);
 			item.SetHidden((m_QualityMode == X264_RC_ABR) || (m_NumPasses > 1));
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to populate qp slider UI entry");
 				return errFail;
 			}
@@ -299,11 +274,10 @@ private:
 
 		{
 			HostUIConfigEntryRef item("x264_bitrate");
-			item.MakeSlider("Bit Rate", "Kbps", m_BitRate, 100, 100000, 1);
+			item.MakeSlider("Bit Rate", "Kbps", m_BitRate, 100, 100000, 8000, 1);
 			item.SetHidden((m_QualityMode != X264_RC_ABR) && (m_NumPasses < 2));
 
-			if (!item.IsSuccess() || !p_pSettingsList->Append(&item))
-			{
+			if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 				g_Log(logLevelError, "X264 Plugin :: Failed to populate bitrate slider UI entry");
 				return errFail;
 			}
@@ -400,8 +374,7 @@ StatusCode X264Encoder::s_RegisterCodecs(HostListRef* p_pList)
 {
 	// add x264 encoder
 	HostPropertyCollectionRef codecInfo;
-	if (!codecInfo.IsValid())
-	{
+	if (!codecInfo.IsValid()) {
 		return errAlloc;
 	}
 
@@ -450,19 +423,16 @@ StatusCode X264Encoder::s_RegisterCodecs(HostListRef* p_pList)
 	containerVec.push_back("mp4");
 	containerVec.push_back("mov");
 	std::string valStrings;
-	for (size_t i = 0; i < containerVec.size(); ++i)
-	{
+	for (size_t i = 0; i < containerVec.size(); ++i) {
 		valStrings.append(containerVec[i]);
-		if (i < (containerVec.size() - 1))
-		{
+		if (i < (containerVec.size() - 1)) {
 			valStrings.append(1, '\0');
 		}
 	}
 
 	codecInfo.SetProperty(pIOPropContainerList, propTypeString, valStrings.c_str(), valStrings.size());
 
-	if (!p_pList->Append(&codecInfo))
-	{
+	if (!p_pList->Append(&codecInfo)) {
 		return errFail;
 	}
 
@@ -480,8 +450,7 @@ X264Encoder::X264Encoder()
 
 X264Encoder::~X264Encoder()
 {
-	if (m_pContext)
-	{
+	if (m_pContext) {
 		x264_encoder_close(m_pContext);
 		m_pContext = 0;
 	}
@@ -490,21 +459,18 @@ X264Encoder::~X264Encoder()
 void X264Encoder::DoFlush()
 {
 
-	if (m_Error != errNone)
-	{
+	if (m_Error != errNone) {
 		return;
 	}
 
 	StatusCode sts = DoProcess(NULL);
-	while (sts == errNone)
-	{
+	while (sts == errNone) {
 		sts = DoProcess(NULL);
 	}
 
 	++m_PassesDone;
 
-	if (!m_IsMultiPass || (m_PassesDone > 1))
-	{
+	if (!m_IsMultiPass || (m_PassesDone > 1)) {
 
 		// clean up temp files used in multipass
 		std::filesystem::remove(m_TmpFileNameIn);
@@ -516,8 +482,7 @@ void X264Encoder::DoFlush()
 		return;
 	}
 
-	if (m_PassesDone == 1)
-	{
+	if (m_PassesDone == 1) {
 		// setup new pass
 		SetupContext(true /* isFinalPass */);
 	}
@@ -539,8 +504,7 @@ StatusCode X264Encoder::DoInit(HostPropertyCollectionRef* p_pProps)
 
 void X264Encoder::SetupContext(bool p_IsFinalPass)
 {
-	if (m_pContext)
-	{
+	if (m_pContext) {
 		x264_encoder_close(m_pContext);
 		m_pContext = 0;
 	}
@@ -569,38 +533,30 @@ void X264Encoder::SetupContext(bool p_IsFinalPass)
 	param.b_stitchable = 1;
 	param.vui.b_fullrange = m_CommonProps.IsFullRange();
 
-	if (strcmp(pProfile, "baseline") != 0)
-	{
+	if (strcmp(pProfile, "baseline") != 0) {
 		const uint8_t fieldOrder = m_CommonProps.GetFieldOrder();
 		param.b_interlaced = ((fieldOrder == fieldTop) || (fieldOrder == fieldBottom));
 	}
 
 	param.rc.i_rc_method = m_pSettings->GetQualityMode();
-	if (!m_IsMultiPass && (param.rc.i_rc_method != X264_RC_ABR))
-	{
+	if (!m_IsMultiPass && (param.rc.i_rc_method != X264_RC_ABR)) {
 		const int qp = m_pSettings->GetQP();
 
 		param.rc.i_qp_constant = qp;
 		param.rc.f_rf_constant = std::min<int>(50, qp);
 		param.rc.f_rf_constant_max = std::min<int>(51, qp + 5);
-	}
-	else if (param.rc.i_rc_method == X264_RC_ABR)
-	{
+	} else if (param.rc.i_rc_method == X264_RC_ABR) {
 		param.rc.i_bitrate = m_pSettings->GetBitRate();
 		param.rc.i_vbv_buffer_size = m_pSettings->GetBitRate();
 		param.rc.i_vbv_max_bitrate = m_pSettings->GetBitRate();
 	}
 
-	if (m_IsMultiPass)
-	{
-		if (p_IsFinalPass && (m_PassesDone > 0))
-		{
+	if (m_IsMultiPass) {
+		if (p_IsFinalPass && (m_PassesDone > 0)) {
 			param.rc.b_stat_read = 1;
 			param.rc.b_stat_write = 0;
 			x264_param_apply_fastfirstpass(&param);
-		}
-		else if (!p_IsFinalPass)
-		{
+		} else if (!p_IsFinalPass) {
 			param.rc.b_stat_read = 0;
 			param.rc.b_stat_write = 1;
 		}
@@ -611,11 +567,9 @@ void X264Encoder::SetupContext(bool p_IsFinalPass)
 		m_TmpFileNameOut = &s_TmpFileName[0];
 	}
 
-	if (pProfile != NULL)
-	{
+	if (pProfile != NULL) {
 		int resCode = x264_param_apply_profile(&param, pProfile);
-		if (resCode != 0)
-		{
+		if (resCode != 0) {
 			m_Error = errFail;
 			return;
 		}
@@ -632,13 +586,10 @@ StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 	m_CommonProps.Load(p_pBuff);
 
 	const std::string& path = m_CommonProps.GetPath();
-	if (!path.empty())
-	{
+	if (!path.empty()) {
 		s_TmpFileName = path;
 		s_TmpFileName.append(".pass.log");
-	}
-	else
-	{
+	} else {
 		s_TmpFileName = "/tmp/x264_multipass.log";
 	}
 
@@ -646,36 +597,30 @@ StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 	m_pSettings->Load(p_pBuff);
 
 	uint8_t isMultiPass = 0;
-	if (m_pSettings->GetNumPasses() == 2)
-	{
+	if (m_pSettings->GetNumPasses() == 2) {
 		m_IsMultiPass = true;
 		isMultiPass = 1;
 	}
 
 	// @TODO: Need to fill maximum output size pIOPropInitFrameBytes if know or otherwise can be larger than an image
 	StatusCode sts = p_pBuff->SetProperty(pIOPropMultiPass, propTypeUInt8, &isMultiPass, 1);
-	if (sts != errNone)
-	{
+	if (sts != errNone) {
 		return sts;
 	}
 
 	// setup context for cookie
 	SetupContext(true /* isFinalPass */);
-	if (m_Error != errNone)
-	{
+	if (m_Error != errNone) {
 		return m_Error;
 	}
 
 	x264_nal_t* pNals = 0;
 	int numNals = 0;
 	int hdrBytes = x264_encoder_headers(m_pContext, &pNals, &numNals);
-	if (hdrBytes > 0)
-	{
+	if (hdrBytes > 0) {
 		std::vector<uint8_t> cookie;
-		for (int i = 0; i < numNals; ++i)
-		{
-			if (pNals[i].i_type == NAL_SEI)
-			{
+		for (int i = 0; i < numNals; ++i) {
+			if (pNals[i].i_type == NAL_SEI) {
 				continue;
 			}
 
@@ -686,8 +631,7 @@ StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 			cookie.insert(cookie.end(), pNals[i].p_payload, pNals[i].p_payload + pNals[i].i_payload);
 		}
 
-		if (!cookie.empty())
-		{
+		if (!cookie.empty()) {
 			p_pBuff->SetProperty(pIOPropMagicCookie, propTypeUInt8, &cookie[0], cookie.size());
 			uint32_t fourCC = 0;
 			p_pBuff->SetProperty(pIOPropMagicCookieType, propTypeUInt32, &fourCC, 1);
@@ -697,11 +641,9 @@ StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 	uint32_t temporal = 2;
 	p_pBuff->SetProperty(pIOPropTemporalReordering, propTypeUInt32, &temporal, 1);
 
-	if (isMultiPass)
-	{
+	if (isMultiPass) {
 		SetupContext(false /* isFinalPass */);
-		if (m_Error != errNone)
-		{
+		if (m_Error != errNone) {
 			return m_Error;
 		}
 	}
@@ -711,14 +653,12 @@ StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 
 StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 {
-	if (m_Error != errNone)
-	{
+	if (m_Error != errNone) {
 		return m_Error;
 	}
 
 	const int numDelayedFrames = x264_encoder_delayed_frames(m_pContext);
-	if (((p_pBuff == NULL) || !p_pBuff->IsValid()) && (numDelayedFrames == 0))
-	{
+	if (((p_pBuff == NULL) || !p_pBuff->IsValid()) && (numDelayedFrames == 0)) {
 		return errMoreData;
 	}
 
@@ -729,24 +669,19 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 	int bytes = 0;
 	int64_t pts = -1;
 
-	if ((p_pBuff == NULL) || !p_pBuff->IsValid())
-	{
+	if ((p_pBuff == NULL) || !p_pBuff->IsValid()) {
 		// flushing
 		bytes = x264_encoder_encode(m_pContext, &pNals, &numNals, 0, &outPic);
 
-	}
-	else
-	{
+	} else {
 		char* pBuf = NULL;
 		size_t bufSize = 0;
-		if (!p_pBuff->LockBuffer(&pBuf, &bufSize))
-		{
+		if (!p_pBuff->LockBuffer(&pBuf, &bufSize)) {
 			g_Log(logLevelError, "X264 Plugin :: Failed to lock the buffer");
 			return errFail;
 		}
 
-		if (pBuf == NULL || bufSize == 0)
-		{
+		if (pBuf == NULL || bufSize == 0) {
 			g_Log(logLevelError, "X264 Plugin :: No data to encode");
 			p_pBuff->UnlockBuffer();
 			return errUnsupported;
@@ -754,14 +689,12 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 
 		uint32_t width = 0;
 		uint32_t height = 0;
-		if (!p_pBuff->GetUINT32(pIOPropWidth, width) || !p_pBuff->GetUINT32(pIOPropHeight, height))
-		{
+		if (!p_pBuff->GetUINT32(pIOPropWidth, width) || !p_pBuff->GetUINT32(pIOPropHeight, height)) {
 			g_Log(logLevelError, "X264 Plugin :: Width/Height not set when encoding the frame");
 			return errNoParam;
 		}
 
-		if (!p_pBuff->GetINT64(pIOPropPTS, pts))
-		{
+		if (!p_pBuff->GetINT64(pIOPropPTS, pts)) {
 			g_Log(logLevelError, "X264 Plugin :: PTS not set when encoding the frame");
 			return errNoParam;
 		}
@@ -773,8 +706,7 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 		inPic.img.plane[2] = 0;
 		inPic.img.plane[3] = 0;
 		inPic.img.i_csp = m_ColorModel;
-		if (m_ColorModel == X264_CSP_UYVY)
-		{
+		if (m_ColorModel == X264_CSP_UYVY) {
 			std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 			inPic.img.i_plane = 1;
@@ -790,9 +722,7 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 			g_Log(logLevelInfo, s_durationMsg.c_str());
 
 			p_pBuff->UnlockBuffer();
-		}
-		else
-		{
+		} else {
 			std::vector<uint8_t> yPlane;
 			std::vector<uint8_t> uvPlane;
 			yPlane.reserve(width * height);
@@ -800,14 +730,11 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 
 			const uint8_t* pSrc = reinterpret_cast<uint8_t*>(const_cast<char*>(pBuf));
 
-			for (int h = 0; h < height; ++h)
-			{
-				for (int w = 0; w < width; w += 2)
-				{
+			for (int h = 0; h < height; ++h) {
+				for (int w = 0; w < width; w += 2) {
 					yPlane.push_back(pSrc[1]);
 					yPlane.push_back(pSrc[3]);
-					if ((h % 2) == 0)
-					{
+					if ((h % 2) == 0) {
 						uvPlane.push_back(pSrc[0]);
 						uvPlane.push_back(pSrc[2]);
 					}
@@ -829,30 +756,23 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 		}
 	}
 
-	if (bytes < 0)
-	{
+	if (bytes < 0) {
 		return errFail;
-	}
-	else if (bytes == 0)
-	{
+	} else if (bytes == 0) {
 		return errMoreData;
-	}
-	else if (m_IsMultiPass && (m_PassesDone == 0))
-	{
+	} else if (m_IsMultiPass && (m_PassesDone == 0)) {
 		return errNone;
 	}
 
 	// fill the out buffer and info
 	HostBufferRef outBuf(false);
-	if (!outBuf.IsValid() || !outBuf.Resize(bytes))
-	{
+	if (!outBuf.IsValid() || !outBuf.Resize(bytes)) {
 		return errAlloc;
 	}
 
 	char* pOutBuf = NULL;
 	size_t outBufSize = 0;
-	if (!outBuf.LockBuffer(&pOutBuf, &outBufSize))
-	{
+	if (!outBuf.LockBuffer(&pOutBuf, &outBufSize)) {
 		return errAlloc;
 	}
 
