@@ -6,7 +6,6 @@
 #include <stdint.h>
 
 #include <algorithm>
-#include <chrono>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -97,7 +96,7 @@ private:
 		m_Profile = 1;
 		m_NumPasses = 1;
 		m_QualityMode = X264_RC_CRF;
-		m_QP = 22;
+		m_QP = 23;
 		m_BitRate = 8000;
 	}
 
@@ -440,7 +439,7 @@ StatusCode X264Encoder::s_RegisterCodecs(HostListRef* p_pList)
 }
 
 X264Encoder::X264Encoder()
-	: m_pContext(0)
+	: m_pContext(NULL)
 	, m_ColorModel(-1)
 	, m_IsMultiPass(false)
 	, m_PassesDone(0)
@@ -450,7 +449,7 @@ X264Encoder::X264Encoder()
 
 X264Encoder::~X264Encoder()
 {
-	if (m_pContext) {
+	if (m_pContext != NULL) {
 		x264_encoder_close(m_pContext);
 		m_pContext = 0;
 	}
@@ -504,9 +503,9 @@ StatusCode X264Encoder::DoInit(HostPropertyCollectionRef* p_pProps)
 
 void X264Encoder::SetupContext(bool p_IsFinalPass)
 {
-	if (m_pContext) {
+	if (m_pContext != NULL) {
 		x264_encoder_close(m_pContext);
-		m_pContext = 0;
+		m_pContext = NULL;
 	}
 
 	x264_param_t param;
@@ -707,20 +706,10 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 		inPic.img.plane[3] = 0;
 		inPic.img.i_csp = m_ColorModel;
 		if (m_ColorModel == X264_CSP_UYVY) {
-			std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
 			inPic.img.i_plane = 1;
 			inPic.img.i_stride[0] = width * 2;
 			inPic.img.plane[0] = reinterpret_cast<uint8_t*>(const_cast<char*>(pBuf));
 			bytes = x264_encoder_encode(m_pContext, &pNals, &numNals, &inPic, &outPic);
-
-			std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
-			std::string s_durationMsg = "X264 Plugin :: x264_encoder_encode microseconds :: ";
-			s_durationMsg.append(std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()));
-
-			g_Log(logLevelInfo, s_durationMsg.c_str());
-
 			p_pBuff->UnlockBuffer();
 		} else {
 			std::vector<uint8_t> yPlane;
