@@ -369,10 +369,10 @@ StatusCode X264Encoder::s_RegisterCodecs(HostListRef* p_pList)
 	codecInfo.SetProperty(pIOPropUUID, propTypeUInt8, X264Encoder::s_UUID, 16);
 
 	const char* pCodecName = "Auto";
-	codecInfo.SetProperty(pIOPropName, propTypeString, pCodecName, strlen(pCodecName));
+	codecInfo.SetProperty(pIOPropName, propTypeString, pCodecName, static_cast<int>(strlen(pCodecName)));
 
 	const char* pCodecGroup = "X264 (8-bit)";
-	codecInfo.SetProperty(pIOPropGroup, propTypeString, pCodecGroup, strlen(pCodecGroup));
+	codecInfo.SetProperty(pIOPropGroup, propTypeString, pCodecGroup, static_cast<int>(strlen(pCodecGroup)));
 
 	uint32_t val = 'avc1';
 	codecInfo.SetProperty(pIOPropFourCC, propTypeUInt32, &val, 1);
@@ -390,7 +390,7 @@ StatusCode X264Encoder::s_RegisterCodecs(HostListRef* p_pList)
 	std::vector<uint8_t> dataRangeVec;
 	dataRangeVec.push_back(0);
 	dataRangeVec.push_back(1);
-	codecInfo.SetProperty(pIOPropDataRange, propTypeUInt8, dataRangeVec.data(), dataRangeVec.size());
+	codecInfo.SetProperty(pIOPropDataRange, propTypeUInt8, dataRangeVec.data(), static_cast<int>(dataRangeVec.size()));
 
 	uint8_t hSampling = 2;
 	uint8_t vSampling = 1;
@@ -418,7 +418,7 @@ StatusCode X264Encoder::s_RegisterCodecs(HostListRef* p_pList)
 		}
 	}
 
-	codecInfo.SetProperty(pIOPropContainerList, propTypeString, valStrings.c_str(), valStrings.size());
+	codecInfo.SetProperty(pIOPropContainerList, propTypeString, valStrings.c_str(), static_cast<int>(valStrings.size()));
 
 	if (!p_pList->Append(&codecInfo)) {
 		return errFail;
@@ -520,7 +520,7 @@ StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 		}
 
 		if (!cookie.empty()) {
-			p_pBuff->SetProperty(pIOPropMagicCookie, propTypeUInt8, &cookie[0], cookie.size());
+			p_pBuff->SetProperty(pIOPropMagicCookie, propTypeUInt8, &cookie[0], static_cast<int>(cookie.size()));
 			uint32_t fourCC = 0;
 			p_pBuff->SetProperty(pIOPropMagicCookieType, propTypeUInt32, &fourCC, 1);
 		}
@@ -576,8 +576,8 @@ void X264Encoder::SetupContext(bool p_IsFinalPass)
 		const int qp = m_pSettings->GetQP();
 
 		param.rc.i_qp_constant = qp;
-		param.rc.f_rf_constant = std::min<int>(50, qp);
-		param.rc.f_rf_constant_max = std::min<int>(51, qp + 5);
+		param.rc.f_rf_constant = static_cast<float>(std::min<int>(50, qp));
+		param.rc.f_rf_constant_max = static_cast<float>(std::min<int>(51, qp + 5));
 	} else if (param.rc.i_rc_method == X264_RC_ABR) {
 		param.rc.i_bitrate = m_pSettings->GetBitRate();
 		param.rc.i_vbv_buffer_size = m_pSettings->GetBitRate();
@@ -678,8 +678,8 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 
 			const uint8_t* pSrc = reinterpret_cast<uint8_t*>(const_cast<char*>(pBuf));
 
-			for (int h = 0; h < height; ++h) {
-				for (int w = 0; w < width; w += 2) {
+			for (uint32_t h = 0; h < height; ++h) {
+				for (uint32_t w = 0; w < width; w += 2) {
 					yPlane.push_back(pSrc[1]);
 					yPlane.push_back(pSrc[3]);
 					if ((h % 2) == 0) {
