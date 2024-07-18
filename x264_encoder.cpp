@@ -514,17 +514,13 @@ void X264Encoder::SetupContext(bool p_IsFinalPass)
 	m_ColorModel = (((pProfile != NULL) && (strcmp(pProfile, "high422") == 0)) ? X264_CSP_UYVY : X264_CSP_NV12);
 
 	x264_param_default_preset(&param, m_pSettings->GetEncPreset(), m_pSettings->GetTune());
-	param.i_threads = 8;
 	param.i_csp = m_ColorModel;
 	param.i_width = m_CommonProps.GetWidth();
 	param.i_height = m_CommonProps.GetHeight();
 	param.b_vfr_input = 0;
 	param.i_bitdepth = 8;
-	param.i_bframe = 2;
-	param.i_bframe_adaptive = X264_B_ADAPT_NONE;
 	param.i_bframe_pyramid = X264_B_PYRAMID_NORMAL;
 	param.b_open_gop = 1;
-	param.i_keyint_max = 12;
 	param.i_fps_num = m_CommonProps.GetFrameRateNum();
 	param.i_fps_den = m_CommonProps.GetFrameRateDen();
 	param.b_repeat_headers = 0;
