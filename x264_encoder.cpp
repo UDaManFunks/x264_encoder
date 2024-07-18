@@ -447,10 +447,10 @@ X264Encoder::~X264Encoder()
 
 		std::filesystem::remove(m_TmpFileName);
 
-		std::string m_TmpFNMBTree = m_TmpFileName;
-		m_TmpFNMBTree.append(".mbtree");
+		std::string sTmpFNMBTree = m_TmpFileName;
+		sTmpFNMBTree.append(".mbtree");
 
-		std::filesystem::remove(m_TmpFNMBTree);
+		std::filesystem::remove(sTmpFNMBTree);
 	}
 
 }
