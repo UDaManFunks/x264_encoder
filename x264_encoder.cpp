@@ -15,8 +15,6 @@
 
 const uint8_t X264Encoder::s_UUID[] = { 0x6b, 0x88, 0xe8, 0x41, 0xd8, 0xe4, 0x41, 0x4b, 0x87, 0x9e, 0xa4, 0x80, 0xfc, 0x90, 0xda, 0xb4 };
 
-static std::string s_TmpFileName = "/tmp/x264_multipass.log";
-
 class UISettingsController
 {
 public:
@@ -331,15 +329,6 @@ public:
 		return m_MarkerColor;
 	}
 
-	const std::string& GetTmpFileNameIn() const {
-		return m_TmpFileNameIn;
-	}
-
-	const std::string& GetTmpFileNameOut() const {
-		return m_TmpFileNameOut;
-	}
-
-
 private:
 
 	HostCodecConfigCommon m_CommonProps;
@@ -451,45 +440,23 @@ X264Encoder::~X264Encoder()
 {
 	if (m_pContext != NULL) {
 		x264_encoder_close(m_pContext);
-		m_pContext = 0;
-	}
-}
-
-void X264Encoder::DoFlush()
-{
-
-	if (m_Error != errNone) {
-		return;
+		m_pContext = NULL;
 	}
 
-	StatusCode sts = DoProcess(NULL);
-	while (sts == errNone) {
-		sts = DoProcess(NULL);
+	if (m_IsMultiPass && (m_PassesDone > 1)) {
+
+		std::filesystem::remove(m_TmpFileName);
+
+		std::string m_TmpFNMBTree = m_TmpFileName;
+		m_TmpFNMBTree.append(".mbtree");
+
+		std::filesystem::remove(m_TmpFNMBTree);
 	}
 
-	++m_PassesDone;
-
-	if (!m_IsMultiPass || (m_PassesDone > 1)) {
-
-		// clean up temp files used in multipass
-		std::filesystem::remove(m_TmpFileNameIn);
-
-		if (std::filesystem::exists(m_TmpFileNameOut)) {
-			std::filesystem::remove(m_TmpFileNameOut);
-		}
-
-		return;
-	}
-
-	if (m_PassesDone == 1) {
-		// setup new pass
-		SetupContext(true /* isFinalPass */);
-	}
 }
 
 StatusCode X264Encoder::DoInit(HostPropertyCollectionRef* p_pProps)
 {
-	// fill average frame size if have byte rate
 	uint32_t val = clrUYVY;
 	p_pProps->SetProperty(pIOPropColorModel, propTypeUInt32, &val, 1);
 
@@ -501,79 +468,6 @@ StatusCode X264Encoder::DoInit(HostPropertyCollectionRef* p_pProps)
 	return errNone;
 }
 
-void X264Encoder::SetupContext(bool p_IsFinalPass)
-{
-	if (m_pContext != NULL) {
-		x264_encoder_close(m_pContext);
-		m_pContext = NULL;
-	}
-
-	x264_param_t param;
-
-	const char* pProfile = m_pSettings->GetProfile();
-	m_ColorModel = (((pProfile != NULL) && (strcmp(pProfile, "high422") == 0)) ? X264_CSP_UYVY : X264_CSP_NV12);
-
-	x264_param_default_preset(&param, m_pSettings->GetEncPreset(), m_pSettings->GetTune());
-	param.i_csp = m_ColorModel;
-	param.i_width = m_CommonProps.GetWidth();
-	param.i_height = m_CommonProps.GetHeight();
-	param.b_vfr_input = 0;
-	param.i_bitdepth = 8;
-	param.i_bframe_pyramid = X264_B_PYRAMID_NORMAL;
-	param.b_open_gop = 1;
-	param.i_fps_num = m_CommonProps.GetFrameRateNum();
-	param.i_fps_den = m_CommonProps.GetFrameRateDen();
-	param.b_repeat_headers = 0;
-	param.b_annexb = 0;
-	param.b_stitchable = 1;
-	param.vui.b_fullrange = m_CommonProps.IsFullRange();
-
-	if (strcmp(pProfile, "baseline") != 0) {
-		const uint8_t fieldOrder = m_CommonProps.GetFieldOrder();
-		param.b_interlaced = ((fieldOrder == fieldTop) || (fieldOrder == fieldBottom));
-	}
-
-	param.rc.i_rc_method = m_pSettings->GetQualityMode();
-	if (!m_IsMultiPass && (param.rc.i_rc_method != X264_RC_ABR)) {
-		const int qp = m_pSettings->GetQP();
-
-		param.rc.i_qp_constant = qp;
-		param.rc.f_rf_constant = std::min<int>(50, qp);
-		param.rc.f_rf_constant_max = std::min<int>(51, qp + 5);
-	} else if (param.rc.i_rc_method == X264_RC_ABR) {
-		param.rc.i_bitrate = m_pSettings->GetBitRate();
-		param.rc.i_vbv_buffer_size = m_pSettings->GetBitRate();
-		param.rc.i_vbv_max_bitrate = m_pSettings->GetBitRate();
-	}
-
-	if (m_IsMultiPass) {
-		if (p_IsFinalPass && (m_PassesDone > 0)) {
-			param.rc.b_stat_read = 1;
-			param.rc.b_stat_write = 0;
-			x264_param_apply_fastfirstpass(&param);
-		} else if (!p_IsFinalPass) {
-			param.rc.b_stat_read = 0;
-			param.rc.b_stat_write = 1;
-		}
-
-		param.rc.psz_stat_out = &s_TmpFileName[0];
-		param.rc.psz_stat_in = &s_TmpFileName[0];
-		m_TmpFileNameIn = &s_TmpFileName[0];
-		m_TmpFileNameOut = &s_TmpFileName[0];
-	}
-
-	if (pProfile != NULL) {
-		int resCode = x264_param_apply_profile(&param, pProfile);
-		if (resCode != 0) {
-			m_Error = errFail;
-			return;
-		}
-	}
-
-	m_pContext = x264_encoder_open(&param);
-	m_Error = ((m_pContext != NULL) ? errNone : errFail);
-}
-
 StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 {
 	assert(m_pContext == NULL);
@@ -581,12 +475,11 @@ StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 	m_CommonProps.Load(p_pBuff);
 
 	const std::string& path = m_CommonProps.GetPath();
-	if (!path.empty()) {
-		s_TmpFileName = path;
-		s_TmpFileName.append(".pass.log");
-	} else {
-		s_TmpFileName = "/tmp/x264_multipass.log";
-	}
+
+	assert(!path.empty());
+
+	m_TmpFileName = path;
+	m_TmpFileName.append(".pass.log");
 
 	m_pSettings.reset(new UISettingsController(m_CommonProps));
 	m_pSettings->Load(p_pBuff);
@@ -646,6 +539,78 @@ StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 	return errNone;
 }
 
+void X264Encoder::SetupContext(bool p_IsFinalPass)
+{
+	if (m_pContext != NULL) {
+		x264_encoder_close(m_pContext);
+		m_pContext = NULL;
+	}
+
+	x264_param_t param;
+
+	const char* pProfile = m_pSettings->GetProfile();
+	m_ColorModel = (((pProfile != NULL) && (strcmp(pProfile, "high422") == 0)) ? X264_CSP_UYVY : X264_CSP_NV12);
+
+	x264_param_default_preset(&param, m_pSettings->GetEncPreset(), m_pSettings->GetTune());
+	param.i_csp = m_ColorModel;
+	param.i_width = m_CommonProps.GetWidth();
+	param.i_height = m_CommonProps.GetHeight();
+	param.b_vfr_input = 0;
+	param.i_bitdepth = 8;
+	param.i_bframe_pyramid = X264_B_PYRAMID_NORMAL;
+	param.b_open_gop = 1;
+	param.i_fps_num = m_CommonProps.GetFrameRateNum();
+	param.i_fps_den = m_CommonProps.GetFrameRateDen();
+	param.b_repeat_headers = 0;
+	param.b_annexb = 0;
+	param.b_stitchable = 1;
+	param.vui.b_fullrange = m_CommonProps.IsFullRange();
+
+	if (strcmp(pProfile, "baseline") != 0) {
+		const uint8_t fieldOrder = m_CommonProps.GetFieldOrder();
+		param.b_interlaced = ((fieldOrder == fieldTop) || (fieldOrder == fieldBottom));
+	}
+
+	param.rc.i_rc_method = m_pSettings->GetQualityMode();
+	if (!m_IsMultiPass && (param.rc.i_rc_method != X264_RC_ABR)) {
+		const int qp = m_pSettings->GetQP();
+
+		param.rc.i_qp_constant = qp;
+		param.rc.f_rf_constant = std::min<int>(50, qp);
+		param.rc.f_rf_constant_max = std::min<int>(51, qp + 5);
+	} else if (param.rc.i_rc_method == X264_RC_ABR) {
+		param.rc.i_bitrate = m_pSettings->GetBitRate();
+		param.rc.i_vbv_buffer_size = m_pSettings->GetBitRate();
+		param.rc.i_vbv_max_bitrate = m_pSettings->GetBitRate();
+	}
+
+	if (m_IsMultiPass) {
+
+		if (p_IsFinalPass && (m_PassesDone > 0)) {
+			param.rc.psz_stat_in = &m_TmpFileName[0];
+			param.rc.b_stat_read = 1;
+			param.rc.b_stat_write = 0;
+			x264_param_apply_fastfirstpass(&param);
+		} else if (!p_IsFinalPass) {
+			param.rc.b_stat_read = 0;
+			param.rc.b_stat_write = 1;
+			param.rc.psz_stat_out = &m_TmpFileName[0];
+		}
+
+	}
+
+	if (pProfile != NULL) {
+		int resCode = x264_param_apply_profile(&param, pProfile);
+		if (resCode != 0) {
+			m_Error = errFail;
+			return;
+		}
+	}
+
+	m_pContext = x264_encoder_open(&param);
+	m_Error = ((m_pContext != NULL) ? errNone : errFail);
+}
+
 StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 {
 	if (m_Error != errNone) {
@@ -665,9 +630,7 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 	int64_t pts = -1;
 
 	if ((p_pBuff == NULL) || !p_pBuff->IsValid()) {
-		// flushing
 		bytes = x264_encoder_encode(m_pContext, &pNals, &numNals, 0, &outPic);
-
 	} else {
 		char* pBuf = NULL;
 		size_t bufSize = 0;
@@ -749,7 +712,6 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 		return errNone;
 	}
 
-	// fill the out buffer and info
 	HostBufferRef outBuf(false);
 	if (!outBuf.IsValid() || !outBuf.Resize(bytes)) {
 		return errAlloc;
@@ -775,4 +737,28 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 	outBuf.SetProperty(pIOPropIsKeyFrame, propTypeUInt8, &isKeyFrame, 1);
 
 	return m_pCallback->SendOutput(&outBuf);
+}
+
+void X264Encoder::DoFlush()
+{
+
+	if (m_Error != errNone) {
+		return;
+	}
+
+	StatusCode sts = DoProcess(NULL);
+	while (sts == errNone) {
+		sts = DoProcess(NULL);
+	}
+
+	++m_PassesDone;
+
+	if (!m_IsMultiPass || (m_PassesDone > 1)) {
+		return;
+	}
+
+	if (m_PassesDone == 1) {
+		// setup new pass
+		SetupContext(true /* isFinalPass */);
+	}
 }
