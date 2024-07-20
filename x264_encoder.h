@@ -54,6 +54,7 @@ private:
 
 	bool m_IsMultiPass;
 	uint32_t m_PassesDone;
+	uint32_t m_BFrames;
 	StatusCode m_Error;
 
 };

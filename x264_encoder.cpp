@@ -433,6 +433,7 @@ X264Encoder::X264Encoder()
 	, m_IsMultiPass(false)
 	, m_PassesDone(0)
 	, m_Error(errNone)
+	, m_BFrames(0)
 {
 }
 
@@ -526,8 +527,9 @@ StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 		}
 	}
 
-	uint32_t temporal = 2;
-	p_pBuff->SetProperty(pIOPropTemporalReordering, propTypeUInt32, &temporal, 1);
+	p_pBuff->SetProperty(pIOPropTemporalReordering, propTypeUInt32, &m_BFrames, 1);
+
+	g_Log(logLevelInfo, "X264 Plugin :: bFrames = %d set based on profile", m_BFrames);
 
 	if (isMultiPass) {
 		SetupContext(false /* isFinalPass */);
@@ -607,7 +609,11 @@ void X264Encoder::SetupContext(bool p_IsFinalPass)
 		}
 	}
 
+	m_BFrames = param.i_bframe;
+
 	m_pContext = x264_encoder_open(&param);
+
+
 	m_Error = ((m_pContext != NULL) ? errNone : errFail);
 }
 
