@@ -35,7 +35,7 @@ Create Directory C:\VideoEditingUtils\x264_plugin_build
 4) This will open up another terminal, type in the following commands (in the new terminal)
 5) cd /C/VideoEditingUtils/x264_plugin_build/x264
 6) CC=cl ./configure --enable-static
-7) make
+7) make -j 8
 
 [Download x264_encoder]
 
