@@ -1,4 +1,5 @@
-#pragma once
+#ifndef X264ENCODER_WRAPPER_HOST_API_H_
+#define X264ENCODER_WRAPPER_HOST_API_H_
 
 #include <string.h>
 #include <stdint.h>
@@ -322,3 +323,5 @@ namespace IOPlugin
         std::map<double, HostMarkerInfo> m_MarkersMap;
     };
 }
+
+#endif // X264ENCODER_WRAPPER_HOST_API_H_

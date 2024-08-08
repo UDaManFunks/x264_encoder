@@ -1,4 +1,5 @@
-#pragma once
+#ifndef X264ENCODER_WRAPPER_PLUGIN_API_H_
+#define X264ENCODER_WRAPPER_PLUGIN_API_H_
 
 #include <stdarg.h>
 
@@ -160,3 +161,4 @@ namespace IOPlugin
     };
 };
 
+#endif // X264ENCODER_WRAPPER_PLUGIN_API_H_
