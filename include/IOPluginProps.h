@@ -1,4 +1,5 @@
-#pragma once
+#ifndef X264ENCODER_INCLUDE_IOPLUGIN_PROPS_H_
+#define X264ENCODER_INCLUDE_IOPLUGIN_PROPS_H_
 
 namespace IOPlugin
 {
@@ -174,3 +175,5 @@ namespace IOPlugin
 
     static PropertyID pIOPropMarkersBlob = "markersBlob"; // uint8_t array containing markers data
 }
+
+#endif // X264ENCODER_INCLUDE_IOPLUGIN_PROPS_H_
