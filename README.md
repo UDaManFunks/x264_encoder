@@ -73,39 +73,42 @@ Instructions:
 
 Create a directory in your HOME directory named x264_plugin_build
 
-1) mkdir ~/x264_plugin_build
+> mkdir ~/x264_plugin_build
 
 [Download x264]
 
-2) cd ~/x264_plugin_build
-3) git clone https://code.videolan.org/videolan/x264
+> cd ~/x264_plugin_build
+
+> git clone https://code.videolan.org/videolan/x264
 
 [Compile x264]
 
-4) cd  ~/x264_plugin_build/x264
-5) ./configure --enable-static --extra-cflags="-fPIC"
-6) make -j 8
+> cd  ~/x264_plugin_build/x264
+
+> ./configure --enable-static --extra-cflags="-fPIC"
+
+> make -j 8
 
 [Download x264_encoder]
 
-7) cd ~/x264_plugin_build
-8) git clone https://github.com/UDaManFunks/x264_encoder
+> cd ~/x264_plugin_build
+
+> git clone https://github.com/UDaManFunks/x264_encoder
 
 [Compile x264_encoder]
 
-9) cd ~/x264_plugin_build/x264_encoder 
-10) make
+> cd ~/x264_plugin_build/x264_encoder
+
+> make
    
 [Packaging / Installing]
 
-11) Create the plugin folder structure
+Create the plugin folder structure
 
-	sudo mkdir /opt/resolve/IOPlugins/x264_encoder.dvcp.bundle/Contents/Linux-x86-64
+> sudo mkdir /opt/resolve/IOPlugins/x264_encoder.dvcp.bundle/Contents/Linux-x86-64
 
-12) Move the newly built binary the to the folder you created in Step #11
+Move the newly built binary the to the folder you created in Step #11
 
-	sudo mv bin/x264_encoder.dvcp /opt/resolve/IOPlugins/x264_encoder.dvcp.bundle/Contents/Linux-x86-64/
+> sudo mv bin/x264_encoder.dvcp /opt/resolve/IOPlugins/x264_encoder.dvcp.bundle/Contents/Linux-x86-64/
 
-13) Restart Davinci Resolve Studio 
-   
-You can export using X264 if you pick "QUICKTIME" or "MP4" as your FORMAT in Davnci Resolve, then selecting the "X264 (8-bit)" Codec option.
+Restart Davinci Resolve Studio 
