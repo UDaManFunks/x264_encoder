@@ -3,7 +3,7 @@ BASE_DIR = ./
 OBJ_DIR = ./build
 BUILD_DIR = ./bin
 X264_DIR = ../x264
-CFLAGS = -O2 -fPIC -Iinclude -Iwrapper -I$(X264_DIR)
+CFLAGS = -O3 -fPIC -Iinclude -Iwrapper -I$(X264_DIR)
 
 ifeq ($(OS_TYPE), Linux)
 LDFLAGS = -shared -lpthread
