@@ -1,15 +1,16 @@
-#pragma once
+#ifndef X264ENCODER__X264_ENCODER_H_
+#define X264ENCODER__X264_ENCODER_H_
 
 #include <memory>
 
 #include "wrapper/plugin_api.h"
+#include "uisettings_controller.h"
+#include "x264.h"
 
 using namespace IOPlugin;
 
-//fwd decl
 struct x264_t;
 struct x264_param_t;
-class UISettingsController;
 
 class X264Encoder : public IPluginCodecRef
 {
@@ -18,7 +19,7 @@ public:
 
 public:
 	X264Encoder();
-	~X264Encoder();
+	virtual ~X264Encoder();
 
 	static StatusCode s_RegisterCodecs(HostListRef* p_pList);
 	static StatusCode s_GetEncoderSettings(HostPropertyCollectionRef* p_pValues, HostListRef* p_pSettingsList);
@@ -36,17 +37,16 @@ public:
 	}
 
 protected:
-	virtual void DoFlush() override;
-	virtual StatusCode DoInit(HostPropertyCollectionRef* p_pProps) override;
-	virtual StatusCode DoOpen(HostBufferRef* p_pBuff) override;
+	virtual void DoFlush() override final;
+	virtual StatusCode DoInit(HostPropertyCollectionRef* p_pProps) override final;
+	virtual StatusCode DoOpen(HostBufferRef* p_pBuff) override final;
 	virtual StatusCode DoProcess(HostBufferRef* p_pBuff) override;
 
-private:
-	void SetupContext(bool p_IsFinalPass);
 
-private:
+protected:
 	x264_t* m_pContext;
 	int m_ColorModel;
+	int m_Profile;
 	std::string m_TmpFileName;
 
 	std::unique_ptr<UISettingsController> m_pSettings;
@@ -57,4 +57,9 @@ private:
 	uint32_t m_BFrames;
 	StatusCode m_Error;
 
+private:
+	int GetProfile();
+	void SetupContext(bool p_IsFinalPass);
 };
+
+#endif // X264ENCODER__X264_ENCODER_H_
