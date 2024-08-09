@@ -10,8 +10,6 @@ HEADERS = plugin.h x264_encoder.h x264_encoder_main.h x264_encoder_high.h x264_e
 SRCS = plugin.cpp x264_encoder.cpp x264_encoder_main.cpp x264_encoder_high.cpp x264_encoder_h422.cpp
 OBJS = $(SRCS:%.cpp=$(OBJ_DIR)/%.o)
 
-#LDFLAGS = -shared -lpthread -Wl,-Bsymbolic
-
 ifeq ($(OS_TYPE), Linux)
 LDFLAGS = -shared -lpthread
 else
