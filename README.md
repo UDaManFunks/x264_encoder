@@ -85,9 +85,11 @@ Create a directory in your HOME directory named x264_plugin_build
 
 > cd  ~/x264_plugin_build/x264
 
-> ./configure --enable-static --extra-cflags="-fPIC"
+> ./configure --prefix=../x264_pkg --enable-static --disable-cli --enable-pic
 
 > make -j 8
+
+> make install
 
 [Download x264_encoder]
 
