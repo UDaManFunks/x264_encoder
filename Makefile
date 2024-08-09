@@ -5,13 +5,15 @@ BUILD_DIR = ./bin
 X264_DIR = ../x264_pkg
 WRAPPER_DIR = ./wrapper
 TARGET = $(BUILD_DIR)/x264_encoder.dvcp
-CFLAGS = -O3 -Iinclude -Iwrapper -I$(X264_DIR)/include -Wall -Wno-unused-variable -Wno-multichar -fPIC -std=c++20
+CFLAGS = -O3 -Iinclude -Iwrapper -I$(X264_DIR)/include -Wall -Wno-unused-variable -fPIC -Wno-multichar -std=c++20
 HEADERS = plugin.h x264_encoder.h x264_encoder_main.h x264_encoder_high.h x264_encoder_h422.h
 SRCS = plugin.cpp x264_encoder.cpp x264_encoder_main.cpp x264_encoder_high.cpp x264_encoder_h422.cpp
 OBJS = $(SRCS:%.cpp=$(OBJ_DIR)/%.o)
 
+#LDFLAGS = -shared -lpthread -Wl,-Bsymbolic
+
 ifeq ($(OS_TYPE), Linux)
-LDFLAGS = -shared -lpthread -Wl,-Bsymbolic
+LDFLAGS = -shared -lpthread
 else
 LDFLAGS = -dynamiclib
 endif
