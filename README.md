@@ -34,7 +34,7 @@ Create Directory C:\VideoEditingUtils\x264_plugin_build
 3) Execute the command "msys2_shell.cmd -mingw64 -full-path"
 4) This will open up another terminal, type in the following commands (in the new terminal)
 5) cd /C/VideoEditingUtils/x264_plugin_build/x264
-6) CC=cl ./configure --enable-static
+6) CC=cl ./configure  --prefix=../x264_pkg --enable-static --disable-cli
 7) make -j 8
 
 [Download x264_encoder]
