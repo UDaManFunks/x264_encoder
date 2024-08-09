@@ -8,7 +8,7 @@ TARGET = $(BUILD_DIR)/x264_encoder.dvcp
 CFLAGS = -O3 -Iinclude -Iwrapper -I$(X264_DIR)/include -Wall -Wno-unused-variable -Wno-multichar -fPIC -std=c++20
 
 ifeq ($(OS_TYPE), Linux)
-LDFLAGS = -shared -lpthread '-Wl,-rpath,$$ORIGIN' -Wl,-z,origin 
+LDFLAGS = -shared -lpthread 
 else
 LDFLAGS = -dynamiclib
 endif
