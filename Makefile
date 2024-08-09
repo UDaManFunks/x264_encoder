@@ -11,7 +11,7 @@ SRCS = plugin.cpp x264_encoder.cpp x264_encoder_main.cpp x264_encoder_high.cpp x
 OBJS = $(SRCS:%.cpp=$(OBJ_DIR)/%.o)
 
 ifeq ($(OS_TYPE), Linux)
-LDFLAGS = -shared -lpthread -Wl,-Bsymbolic
+LDFLAGS = -fPIC -shared -lpthread -Wl,-Bsymbolic
 else
 LDFLAGS = -dynamiclib
 endif
