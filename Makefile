@@ -2,21 +2,21 @@ OS_TYPE := $(shell uname -s)
 BASE_DIR = ./
 OBJ_DIR = ./build
 BUILD_DIR = ./bin
-X264_DIR = ../x264_pkg
+FFMPEG_DIR = ../ffmpeg_pkg
 WRAPPER_DIR = ./wrapper
-TARGET = $(BUILD_DIR)/x264_encoder.dvcp
-CFLAGS = -O3 -Iinclude -Iwrapper -I$(X264_DIR)/include -Wall -Wno-unused-variable -fPIC -Wno-multichar -std=c++20
-HEADERS = plugin.h x264_encoder.h x264_encoder_main.h x264_encoder_high.h x264_encoder_h422.h
-SRCS = plugin.cpp x264_encoder.cpp x264_encoder_main.cpp x264_encoder_high.cpp x264_encoder_h422.cpp
+CFLAGS = -O3 -fPIC -Iinclude -Iwrapper -I${FFMPEG_DIR}/include -D__STDC_CONSTANT_MACROS -Wno-multichar
+HEADERS = plugin.h uisettings_controller.h prores_worker.h prores_encoder.h prores422_encoder.h proreshq_encoder.h proreslt_encoder.h prorespx_encoder.h
+SRCS = plugin.cpp uisettings_controller.cpp prores_worker.cpp prores_encoder.cpp prores422_encoder.cpp proreshq_encoder.cpp proreslt_encoder.cpp prorespx_encoder.cpp
 OBJS = $(SRCS:%.cpp=$(OBJ_DIR)/%.o)
+TARGET = $(BUILD_DIR)/prores_encoder.dvcp
 
 ifeq ($(OS_TYPE), Linux)
-LDFLAGS = -shared -lpthread
+LDFLAGS = -shared -lpthread -Wl,-Bsymbolic
 else
 LDFLAGS = -dynamiclib
 endif
 
-LDFLAGS += -L$(X264_DIR)/lib -lx264 
+LDFLAGS += -L$(FFMPEG_DIR)/lib -lavcodec -lavfilter -lswscale -lswresample -lavutil
 
 .PHONY: all
 
@@ -33,11 +33,13 @@ $(TARGET):
 	$(CC) $(WRAPPER_DIR)/build/*.o $(OBJ_DIR)/*.o $(LDFLAGS) -o $(TARGET)
 
 clean: clean-subdirs
-	rm -rf $(OBJ_DIR)
-	rm -rf $(BUILD_DIR)
+	rm $(OBJS)
+	rmdir $(OBJ_DIR)
+	rm  $(TARGET)
+	rmdir $(BUILD_DIR)
 
 make-subdirs:
-	(cd wrapper; make; cd ..)
+	(cd $(WRAPPER_DIR); make; cd ..)
 
 clean-subdirs:
-	(cd wrapper; make clean; cd ..)
+	(cd $(WRAPPER_DIR); make clean; cd ..)
