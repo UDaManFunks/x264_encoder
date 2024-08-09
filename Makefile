@@ -3,6 +3,8 @@ BASE_DIR = ./
 OBJ_DIR = ./build
 BUILD_DIR = ./bin
 X264_DIR = ../x264
+WRAPPER_DIR = ./wrapper
+TARGET = $(BUILD_DIR)/x264_encoder.dvcp
 CFLAGS = -O3 -Iinclude -Iwrapper -I$(X264_DIR) -Wall -Wno-unused-variable -Wno-multichar -fPIC -std=c++20
 
 ifeq ($(OS_TYPE), Linux)
@@ -11,7 +13,6 @@ else
 LDFLAGS = -dynamiclib
 endif
 
-TARGET = $(BUILD_DIR)/x264_encoder.dvcp
 LDFLAGS += -L$(X264_DIR) -lx264
 
 .PHONY: all
@@ -30,7 +31,7 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(TARGET):
-	$(CC) $(OBJ_DIR)/*.o $(LDFLAGS) -o $(TARGET)
+	$(CC) $(WRAPPER_DIR)/build/*.o $(OBJ_DIR)/*.o $(LDFLAGS) -o $(TARGET)
 
 clean: clean-subdirs
 	rm -rf $(OBJ_DIR)
