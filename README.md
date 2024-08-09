@@ -108,7 +108,7 @@ Create a directory in your HOME directory named x264_plugin_build
 
 Create the plugin folder structure
 
-> sudo mkdir /opt/resolve/IOPlugins/x264_encoder.dvcp.bundle/Contents/Linux-x86-64
+> sudo mkdir -p /opt/resolve/IOPlugins/x264_encoder.dvcp.bundle/Contents/Linux-x86-64
 
 Move the newly built binary the to the folder you created in Step #11
 
