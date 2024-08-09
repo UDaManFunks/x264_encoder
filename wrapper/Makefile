@@ -10,11 +10,11 @@ OBJS = $(SRCS:%.cpp=$(OBJ_DIR)/%.o)
 all: prereq $(HEADERS) $(SRCS) $(OBJS)
 
 prereq:
-	mkdir $(OBJ_DIR)
+	mkdir -p $(OBJ_DIR)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 clean:
-	rm -f $(OBJS)
-	rm -rf $(OBJ_DIR)
+	rm $(OBJS)
+	rmdir $(OBJ_DIR)
