@@ -36,6 +36,7 @@ Create Directory C:\VideoEditingUtils\x264_plugin_build
 5) cd /C/VideoEditingUtils/x264_plugin_build/x264
 6) CC=cl ./configure  --prefix=../x264_pkg --enable-static --disable-cli
 7) make -j 8
+8) make install
 
 [Download x264_encoder]
 
