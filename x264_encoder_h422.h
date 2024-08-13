@@ -21,7 +21,7 @@ public:
 	static StatusCode s_GetEncoderSettings(HostPropertyCollectionRef* p_pValues, HostListRef* p_pSettingsList);
 
 protected:
-	virtual StatusCode DoProcess(HostBufferRef* p_pBuff) override final;
+	StatusCode DoProcess(HostBufferRef* p_pBuff) override;
 };
 
 #endif // X264ENCODER__X264_ENCODER_H422_H_
