@@ -42,7 +42,6 @@ protected:
 	virtual StatusCode DoOpen(HostBufferRef* p_pBuff) override final;
 	virtual StatusCode DoProcess(HostBufferRef* p_pBuff) override;
 
-
 protected:
 	x264_t* m_pContext;
 	int m_ColorModel;
