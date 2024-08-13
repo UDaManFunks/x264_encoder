@@ -1,15 +1,7 @@
 #include "x264_encoder_h422.h"
 
 #include <assert.h>
-#include <cstring>
 #include <vector>
-#include <stdint.h>
-
-#include <algorithm>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <filesystem>
 
 const uint8_t X264EncoderH422::s_UUID[] = { 0x6b, 0x88, 0xe8, 0x41, 0xd8, 0xe4, 0x41, 0x4b, 0x87, 0x9e, 0xa4, 0x80, 0xfc, 0x90, 0xda, 0xbd };
 
