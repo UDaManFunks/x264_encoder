@@ -87,10 +87,8 @@ StatusCode X264EncoderMain::s_RegisterCodecs(HostListRef* p_pList)
 	return errNone;
 }
 
-X264EncoderMain::X264EncoderMain()
+X264EncoderMain::X264EncoderMain() : X264Encoder(1, X264_CSP_NV12)
 {
-	m_Profile = 1;
-
 	g_Log(logLevelInfo, "X264 Plugin :: X264EncoderMain :: ()");
 }
 

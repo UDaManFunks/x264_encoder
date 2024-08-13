@@ -37,6 +37,7 @@ public:
 	}
 
 protected:
+	X264Encoder(int iProfile, int iColorModel);
 	virtual void DoFlush() override final;
 	virtual StatusCode DoInit(HostPropertyCollectionRef* p_pProps) override final;
 	virtual StatusCode DoOpen(HostBufferRef* p_pBuff) override final;
@@ -44,9 +45,9 @@ protected:
 
 protected:
 	x264_t* m_pContext;
+	std::string m_TmpFileName;
 	int m_ColorModel;
 	int m_Profile;
-	std::string m_TmpFileName;
 
 	std::unique_ptr<UISettingsController> m_pSettings;
 	HostCodecConfigCommon m_CommonProps;

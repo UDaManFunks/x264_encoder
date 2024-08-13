@@ -92,11 +92,8 @@ StatusCode X264EncoderH422::s_RegisterCodecs(HostListRef* p_pList)
 	return errNone;
 }
 
-X264EncoderH422::X264EncoderH422()
+X264EncoderH422::X264EncoderH422() : X264Encoder(4, X264_CSP_UYVY)
 {
-	m_Profile = 4;
-	m_ColorModel = X264_CSP_UYVY;
-
 	g_Log(logLevelInfo, "X264 Plugin :: X264EncoderH422 :: ()");
 }
 

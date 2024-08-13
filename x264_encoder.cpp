@@ -99,6 +99,18 @@ X264Encoder::X264Encoder()
 	g_Log(logLevelInfo, "X264 Plugin :: X264Encoder :: ()");
 }
 
+X264Encoder::X264Encoder(int iProfile, int iColorModel)
+	: m_pContext(nullptr)
+	, m_ColorModel(iColorModel)
+	, m_Profile(iProfile)
+	, m_IsMultiPass(false)
+	, m_PassesDone(0)
+	, m_BFrames(0)
+	, m_Error(errNone)
+{
+	g_Log(logLevelInfo, "X264 Plugin :: X264Encoder :: ( iProfile = %d, iColorModel = %d )", iProfile, iColorModel);
+}
+
 X264Encoder::~X264Encoder()
 {
 	if (m_pContext != nullptr) {

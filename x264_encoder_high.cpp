@@ -89,10 +89,8 @@ StatusCode X264EncoderHigh::s_RegisterCodecs(HostListRef* p_pList)
 	return errNone;
 }
 
-X264EncoderHigh::X264EncoderHigh()
+X264EncoderHigh::X264EncoderHigh() : X264Encoder(2, X264_CSP_NV12)
 {
-	m_Profile = 2;
-
 	g_Log(logLevelInfo, "X264 Plugin :: X264EncoderHigh :: ()");
 
 }
