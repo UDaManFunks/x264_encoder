@@ -82,24 +82,24 @@ StatusCode X264Encoder::s_RegisterCodecs(HostListRef* p_pList)
 
 X264Encoder::X264Encoder()
 	: m_pContext(nullptr)
-	, m_ColorModel(X264_CSP_NV12)
-	, m_Profile(0)
 	, m_IsMultiPass(false)
 	, m_PassesDone(0)
-	, m_BFrames(0)
 	, m_Error(errNone)
+	, m_ColorModel(X264_CSP_NV12)
+	, m_Profile(0)
+	, m_BFrames(0)
 {
 	g_Log(logLevelInfo, "X264 Plugin :: X264Encoder :: ()");
 }
 
 X264Encoder::X264Encoder(int iProfile, int iColorModel)
 	: m_pContext(nullptr)
-	, m_ColorModel(iColorModel)
-	, m_Profile(iProfile)
 	, m_IsMultiPass(false)
 	, m_PassesDone(0)
-	, m_BFrames(0)
 	, m_Error(errNone)
+	, m_ColorModel(iColorModel)
+	, m_Profile(iProfile)
+	, m_BFrames(0)
 {
 	g_Log(logLevelInfo, "X264 Plugin :: X264Encoder :: ( iProfile = %d, iColorModel = %d )", iProfile, iColorModel);
 }
