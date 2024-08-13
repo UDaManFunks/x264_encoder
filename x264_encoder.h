@@ -42,24 +42,26 @@ protected:
 	virtual StatusCode DoInit(HostPropertyCollectionRef* p_pProps) override final;
 	virtual StatusCode DoOpen(HostBufferRef* p_pBuff) override final;
 	virtual StatusCode DoProcess(HostBufferRef* p_pBuff) override;
+	int GetProfile();
+	int GetColorModel();
+
 
 protected:
 	x264_t* m_pContext;
-	std::string m_TmpFileName;
-	int m_ColorModel;
-	int m_Profile;
-
 	std::unique_ptr<UISettingsController> m_pSettings;
 	HostCodecConfigCommon m_CommonProps;
-
 	bool m_IsMultiPass;
 	uint32_t m_PassesDone;
-	uint32_t m_BFrames;
 	StatusCode m_Error;
 
 private:
-	int GetProfile();
 	void SetupContext(bool p_IsFinalPass);
+
+private:
+	std::string m_TmpFileName;
+	int m_ColorModel;
+	int m_Profile;
+	uint32_t m_BFrames;
 };
 
 #endif // X264ENCODER__X264_ENCODER_H_

@@ -95,7 +95,7 @@ X264EncoderH422::~X264EncoderH422()
 
 StatusCode X264EncoderH422::DoProcess(HostBufferRef* p_pBuff)
 {
-	assert(m_ColorModel == X264_CSP_UYVY);
+	assert(GetColorModel() == X264_CSP_UYVY);
 
 	if (m_Error != errNone) {
 		return m_Error;
@@ -147,7 +147,7 @@ StatusCode X264EncoderH422::DoProcess(HostBufferRef* p_pBuff)
 		inPic.img.plane[1] = 0;
 		inPic.img.plane[2] = 0;
 		inPic.img.plane[3] = 0;
-		inPic.img.i_csp = m_ColorModel;
+		inPic.img.i_csp = GetColorModel();
 
 		// harcoded clrUYVY -> X264_CSP_UYVY
 

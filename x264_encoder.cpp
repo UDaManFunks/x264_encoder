@@ -207,12 +207,12 @@ void X264Encoder::SetupContext(bool p_IsFinalPass)
 
 	x264_param_t param;
 
-	const char* pProfile = x264_profile_names[m_Profile];
+	const char* pProfile = x264_profile_names[GetProfile()];
 
 	g_Log(logLevelInfo, "X264 Plugin :: SetupContext :: pProfile = %s", pProfile);
 
 	x264_param_default_preset(&param, m_pSettings->GetEncPreset(), m_pSettings->GetTune());
-	param.i_csp = m_ColorModel;
+	param.i_csp = GetColorModel();
 	param.i_width = m_CommonProps.GetWidth();
 	param.i_height = m_CommonProps.GetHeight();
 	param.b_vfr_input = 0;
@@ -407,4 +407,8 @@ void X264Encoder::DoFlush()
 
 int X264Encoder::GetProfile() {
 	return m_Profile;
+}
+
+int X264Encoder::GetColorModel() {
+	return m_ColorModel;
 }
