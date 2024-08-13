@@ -258,9 +258,14 @@ void X264Encoder::SetupContext(bool p_IsFinalPass)
 
 	m_BFrames = param.i_bframe;
 
-	m_pContext.reset(x264_encoder_open(&param));
+	x264_t* pContext = x264_encoder_open(&param);
 
-	m_Error = (m_pContext) ? errNone : errFail;
+	if (pContext != NULL) {
+		m_pContext.reset(pContext);
+		m_Error = errNone;
+	} else {
+		m_Error = errFail;
+	}
 }
 
 StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
