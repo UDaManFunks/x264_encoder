@@ -81,8 +81,7 @@ StatusCode X264Encoder::s_RegisterCodecs(HostListRef* p_pList)
 }
 
 X264Encoder::X264Encoder()
-	: m_pContext(nullptr)
-	, m_IsMultiPass(false)
+	: m_IsMultiPass(false)
 	, m_PassesDone(0)
 	, m_Error(errNone)
 	, m_ColorModel(X264_CSP_NV12)
@@ -93,8 +92,7 @@ X264Encoder::X264Encoder()
 }
 
 X264Encoder::X264Encoder(int iProfile, int iColorModel)
-	: m_pContext(nullptr)
-	, m_IsMultiPass(false)
+	: m_IsMultiPass(false)
 	, m_PassesDone(0)
 	, m_Error(errNone)
 	, m_ColorModel(iColorModel)
@@ -106,10 +104,6 @@ X264Encoder::X264Encoder(int iProfile, int iColorModel)
 
 X264Encoder::~X264Encoder()
 {
-	if (m_pContext != nullptr) {
-		x264_encoder_close(m_pContext);
-		m_pContext = nullptr;
-	}
 
 	if (m_IsMultiPass && (m_PassesDone > 1)) {
 
@@ -164,7 +158,7 @@ StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 
 	x264_nal_t* pNals = 0;
 	int numNals = 0;
-	int hdrBytes = x264_encoder_headers(m_pContext, &pNals, &numNals);
+	int hdrBytes = x264_encoder_headers(m_pContext.get(), &pNals, &numNals);
 	if (hdrBytes > 0) {
 		std::vector<uint8_t> cookie;
 		for (int i = 0; i < numNals; ++i) {
@@ -200,11 +194,6 @@ StatusCode X264Encoder::DoOpen(HostBufferRef* p_pBuff)
 
 void X264Encoder::SetupContext(bool p_IsFinalPass)
 {
-	if (m_pContext != nullptr) {
-		x264_encoder_close(m_pContext);
-		m_pContext = nullptr;
-	}
-
 	x264_param_t param;
 
 	const char* pProfile = x264_profile_names[GetProfile()];
@@ -268,8 +257,10 @@ void X264Encoder::SetupContext(bool p_IsFinalPass)
 	}
 
 	m_BFrames = param.i_bframe;
-	m_pContext = x264_encoder_open(&param);
-	m_Error = (m_pContext != nullptr) ? errNone : errFail;
+
+	m_pContext.reset(x264_encoder_open(&param));
+
+	m_Error = (m_pContext) ? errNone : errFail;
 }
 
 StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
@@ -280,7 +271,7 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 		return m_Error;
 	}
 
-	const int numDelayedFrames = x264_encoder_delayed_frames(m_pContext);
+	const int numDelayedFrames = x264_encoder_delayed_frames(m_pContext.get());
 	if (((p_pBuff == NULL) || !p_pBuff->IsValid()) && (numDelayedFrames == 0)) {
 		return errMoreData;
 	}
@@ -293,7 +284,7 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 	int64_t pts = -1;
 
 	if ((p_pBuff == NULL) || !p_pBuff->IsValid()) {
-		bytes = x264_encoder_encode(m_pContext, &pNals, &numNals, 0, &outPic);
+		bytes = x264_encoder_encode(m_pContext.get(), &pNals, &numNals, 0, &outPic);
 	} else {
 		char* pBuf = NULL;
 		size_t bufSize = 0;
@@ -342,7 +333,7 @@ StatusCode X264Encoder::DoProcess(HostBufferRef* p_pBuff)
 		inPic.img.i_stride[1] = width;
 		inPic.img.plane[1] = uvSrc;
 
-		bytes = x264_encoder_encode(m_pContext, &pNals, &numNals, &inPic, &outPic);
+		bytes = x264_encoder_encode(m_pContext.get(), &pNals, &numNals, &inPic, &outPic);
 
 		p_pBuff->UnlockBuffer();
 

@@ -12,6 +12,14 @@ using namespace IOPlugin;
 struct x264_t;
 struct x264_param_t;
 
+struct X264APIDeleter {
+	void operator()(x264_t* pContext) {
+		if (pContext != nullptr) {
+			x264_encoder_close(pContext);
+		}
+	}
+};
+
 class X264Encoder : public IPluginCodecRef
 {
 public:
@@ -47,7 +55,7 @@ protected:
 
 
 protected:
-	x264_t* m_pContext;
+	std::unique_ptr<x264_t, X264APIDeleter> m_pContext;
 	std::unique_ptr<UISettingsController> m_pSettings;
 	HostCodecConfigCommon m_CommonProps;
 	bool m_IsMultiPass;

@@ -101,7 +101,7 @@ StatusCode X264EncoderH422::DoProcess(HostBufferRef* p_pBuff)
 		return m_Error;
 	}
 
-	const int numDelayedFrames = x264_encoder_delayed_frames(m_pContext);
+	const int numDelayedFrames = x264_encoder_delayed_frames(m_pContext.get());
 	if (((p_pBuff == NULL) || !p_pBuff->IsValid()) && (numDelayedFrames == 0)) {
 		return errMoreData;
 	}
@@ -114,7 +114,7 @@ StatusCode X264EncoderH422::DoProcess(HostBufferRef* p_pBuff)
 	int64_t pts = -1;
 
 	if ((p_pBuff == NULL) || !p_pBuff->IsValid()) {
-		bytes = x264_encoder_encode(m_pContext, &pNals, &numNals, 0, &outPic);
+		bytes = x264_encoder_encode(m_pContext.get(), &pNals, &numNals, 0, &outPic);
 	} else {
 		char* pBuf = NULL;
 		size_t bufSize = 0;
@@ -154,7 +154,7 @@ StatusCode X264EncoderH422::DoProcess(HostBufferRef* p_pBuff)
 		inPic.img.i_plane = 1;
 		inPic.img.i_stride[0] = width * 2;
 		inPic.img.plane[0] = reinterpret_cast<uint8_t*>(const_cast<char*>(pBuf));
-		bytes = x264_encoder_encode(m_pContext, &pNals, &numNals, &inPic, &outPic);
+		bytes = x264_encoder_encode(m_pContext.get(), &pNals, &numNals, &inPic, &outPic);
 		p_pBuff->UnlockBuffer();
 
 	}
