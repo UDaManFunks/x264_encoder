@@ -62,7 +62,7 @@ Create Directory C:\VideoEditingUtils\x264_plugin_build
 5) Copy the built plugin from C:\VideoEditingUtils\x264_plugin_build\x264_encoder\bin\x264_encoder.dvcp" and place it in the "Win64" folder (which you've created via Step 1-4)
 6) Start Davinci Resolve Studio
    
-You can export using X264 if you pick "QUICKTIME" or "MP4" as your FORMAT in Davnci Resolve, then selecting the "X264 (8-bit)" Codec option.
+You can export using X264 if you pick "QUICKTIME" or "MP4" as your FORMAT in Davnci Resolve, then selecting the "X264 %PROFILE%" codec option.
 
 ----------------- [LINUX] -----------------
 
