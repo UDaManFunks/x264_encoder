@@ -110,7 +110,7 @@ Create the plugin folder structure
 
 > sudo mkdir -p /opt/resolve/IOPlugins/x264_encoder.dvcp.bundle/Contents/Linux-x86-64
 
-Move the newly built binary the to the folder you created in Step #11
+Move the newly built binary the to the folder you created in the previous step.
 
 > sudo mv bin/x264_encoder.dvcp /opt/resolve/IOPlugins/x264_encoder.dvcp.bundle/Contents/Linux-x86-64/
 
