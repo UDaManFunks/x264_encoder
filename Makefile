@@ -5,7 +5,7 @@ BUILD_DIR = ./bin
 X264_DIR = ../x264_pkg
 WRAPPER_DIR = ./wrapper
 TARGET = $(BUILD_DIR)/x264_encoder.dvcp
-CPP = g++
+CXX = g++
 CFLAGS = -O3 -Iinclude -Iwrapper -I$(X264_DIR)/include -Wall -Wno-unused-variable -fPIC -Wno-multichar -std=c++20
 HEADERS = plugin.h uisettings_controller.h x264_encoder.h x264_encoder_main.h x264_encoder_high.h x264_encoder_h422.h
 SRCS = plugin.cpp uisettings_controller.cpp x264_encoder.cpp x264_encoder_main.cpp x264_encoder_high.cpp x264_encoder_h422.cpp
@@ -28,10 +28,10 @@ prereq:
 	mkdir -p $(BUILD_DIR)
 
 $(OBJ_DIR)/%.o: %.cpp
-	$(CPP) -c -o $@ $< $(CFLAGS)
+	$(CXX) -c -o $@ $< $(CFLAGS)
 
 $(TARGET):
-	$(CPP) $(WRAPPER_DIR)/build/*.o $(OBJ_DIR)/*.o $(LDFLAGS) -o $(TARGET)
+	$(CXX) $(WRAPPER_DIR)/build/*.o $(OBJ_DIR)/*.o $(LDFLAGS) -o $(TARGET)
 
 clean: clean-subdirs
 	rm -rf $(OBJ_DIR)
