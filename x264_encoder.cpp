@@ -286,11 +286,26 @@ void X264Encoder::SetupContext(bool p_IsFinalPass)
 		}
 	}
 
+	const int keyframeIntervalMax = m_pSettings->GetKFMax();
+	param.i_keyint_max = keyframeIntervalMax;
+	g_Log(logLevelInfo, "X264 Plugin :: SetupContext :: keyframe interval max = %d", keyframeIntervalMax);
+
+	const int keyframeIntervalMin = m_pSettings->GetKFMin();
+	param.i_keyint_min = keyframeIntervalMin;
+	g_Log(logLevelInfo, "X264 Plugin :: SetupContext :: keyframe interval max = %d", keyframeIntervalMin);
+
+	const int bframeInterval = m_pSettings->GetBF();
+	param.i_bframe = bframeInterval;
+	g_Log(logLevelInfo, "X264 Plugin :: SetupContext :: b-frame interval = %d", bframeInterval);
+
+	const int SceneDetection = m_pSettings->GetSceneDetection();
+	param.i_scenecut_threshold = SceneDetection;
+	g_Log(logLevelInfo, "X264 Plugin :: SetupContext :: scene detection = %d", SceneDetection);
+
 	m_BFrames = param.i_bframe;
+	g_Log(logLevelInfo, "X264 Plugin :: Final settings :: keyint_min = %d, keyint_max = %d, scenecut_threshold = %d", param.i_keyint_min, param.i_keyint_max, param.i_scenecut_threshold);
 
 	x264_t* pContext = x264_encoder_open(&param);
-
-	g_Log(logLevelInfo, "X264 Plugin :: SetupContext :: pContext = %d", pContext);
 
 	if (pContext != NULL) {
 		m_pContext.reset(pContext);

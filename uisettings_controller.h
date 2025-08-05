@@ -64,6 +64,26 @@ namespace IOPlugin {
 			return m_BitRate;
 		}
 
+		int32_t GetKFMax() const
+		{
+			return std::max<int>(0, m_KFMax);
+		}
+
+		int32_t GetKFMin() const
+		{
+			return std::max<int>(0, m_KFMin);
+		}
+
+		int32_t GetBF() const
+		{
+			return std::max<int>(0, m_BF);
+		}
+
+		int32_t GetSceneDetection() const
+		{
+			return std::max<int>(0, m_SceneDetection);
+		}
+
 		const std::string& GetMarkerColor() const
 		{
 			return m_MarkerColor;
@@ -83,6 +103,10 @@ namespace IOPlugin {
 		int32_t m_QP;
 		int32_t m_BitRate;
 		int32_t m_Level;
+		int32_t m_KFMax;
+		int32_t m_KFMin;
+		int32_t m_BF;
+		int32_t m_SceneDetection;
 	};
 
 }

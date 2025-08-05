@@ -36,6 +36,10 @@ void UISettingsController::Load(IPropertyProvider* p_pValues)
 	p_pValues->GetINT32("x264_bitrate", m_BitRate);
 	p_pValues->GetString("x264_enc_markers", m_MarkerColor);
 	p_pValues->GetINT32("x264_level", m_Level);
+	p_pValues->GetINT32("x264_kf_max", m_KFMax);
+	p_pValues->GetINT32("x264_kf_min", m_KFMin);
+	p_pValues->GetINT32("x264_bf", m_BF);
+	p_pValues->GetINT32("x264_scene_detection", m_SceneDetection);
 }
 
 StatusCode UISettingsController::Render(HostListRef* p_pSettingsList)
@@ -77,10 +81,14 @@ void UISettingsController::InitDefaults()
 	m_EncPreset = 4;
 	m_Tune = 0;
 	m_NumPasses = 1;
-	m_Level = 0;
+	m_Level = 0; 
 	m_QualityMode = X264_RC_CRF;
 	m_QP = 23;
 	m_BitRate = 8000;
+	m_KFMax = 250;
+	m_KFMin = 25;
+	m_BF = 3;
+	m_SceneDetection = 40;
 }
 
 StatusCode UISettingsController::RenderGeneral(HostListRef* p_pSettingsList)
@@ -255,6 +263,86 @@ StatusCode UISettingsController::RenderQuality(HostListRef* p_pSettingsList)
 		item.SetHidden((m_QualityMode == X264_RC_ABR) || (m_NumPasses > 1));
 		if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
 			g_Log(logLevelError, "X264 Plugin :: Failed to populate qp slider UI entry");
+			return errFail;
+		}
+	}
+
+	{
+		HostUIConfigEntryRef item("x264_separator");
+		item.MakeSeparator();
+		if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
+			g_Log(logLevelError, "X264 Plugin :: Failed to add a separator entry");
+			return errFail;
+		}
+	}
+
+	{
+		HostUIConfigEntryRef item("x264_kf_max");
+		const char* pLabel = NULL;
+		if (m_KFMax == 250) {
+			pLabel = "(default)";
+		} else {
+			pLabel = " ";
+		}
+		item.MakeSlider("Keyframes Max", pLabel, m_KFMax, 1, 300, 250);
+		item.SetTriggersUpdate(true);
+		if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
+			g_Log(logLevelError, "X264 Plugin :: Failed to populate kf max slider UI entry");
+			return errFail;
+		}
+	}
+
+	{
+		if (m_KFMin > m_KFMax)
+		m_KFMin = m_KFMax;
+		HostUIConfigEntryRef item("x264_kf_min");
+		const char* pLabel = NULL;
+		if (m_KFMin == 25) {
+			pLabel = "(default)";
+		} else {
+			pLabel = " ";
+		}
+		item.MakeSlider("Keyframes Min", pLabel, m_KFMin, 1, 300, 25);
+		item.SetTriggersUpdate(true);
+		if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
+			g_Log(logLevelError, "X264 Plugin :: Failed to populate kf min slider UI entry");
+			return errFail;
+		}
+	}
+
+	{
+		if (m_BF > m_KFMax - 2) {
+    		m_BF = std::max(0, m_KFMax - 2);
+		}
+		HostUIConfigEntryRef item("x264_bf");
+		const char* pLabel = NULL;
+		if (m_BF == 3) {
+			pLabel = "(default)";
+		} else {
+			pLabel = " ";
+		}
+		item.MakeSlider("B-Frames", pLabel, m_BF, 0, 5, 3);
+		item.SetTriggersUpdate(true);
+		if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
+			g_Log(logLevelError, "X264 Plugin :: Failed to populate bf slider UI entry");
+			return errFail;
+		}
+	}
+
+	{
+		HostUIConfigEntryRef item("x264_scene_detection");
+		const char* pLabel = NULL;
+		if (m_SceneDetection == 40) {
+			pLabel = "(default)";
+		} else if (m_SceneDetection == 0) {
+			pLabel = "(OFF)";
+		} else {
+			pLabel = " ";
+		}
+		item.MakeSlider("Scenecut Threshold", pLabel, m_SceneDetection, 0, 100, 40);
+		item.SetTriggersUpdate(true);
+		if (!item.IsSuccess() || !p_pSettingsList->Append(&item)) {
+			g_Log(logLevelError, "X264 Plugin :: Failed to populate scene detection slider UI entry");
 			return errFail;
 		}
 	}
